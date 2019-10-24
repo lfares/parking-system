@@ -1,6 +1,5 @@
-#include "list_queue.h"
-#include "list_stack.h"
 #include "pnf.h"
+#include <stdio.h>
 #include <stdbool.h>
 
 int main(){
@@ -23,8 +22,8 @@ int main(){
         int n;
         scanf("%d", &n);
         switch (n) {
-            case 1:
-                int checkIn_status = checkIn(courtyard_1, courtyard_2, new[i]);
+            case 1:;
+                int checkIn_status = checkIn(courtyard_1, courtyard_2, &new[i]);
                 if (checkIn_status == 1)
                     printf("Carro rejeitado. Placa ja consta no patio.\n");
                 else if (checkIn_status == 2)
@@ -32,13 +31,12 @@ int main(){
                 else{
                     checkOut(courtyard_1, courtyard_2, new[i]);
                     discount_raffle(courtyard_1, courtyard_2, new[i]);
-                    int disponibility_status = disponibility(courtyard_1, courtyard_2, new[i]);
-                    if (disponibility_status == 3)
+                    if (disponibility(courtyard_1, courtyard_2, new[i]) == 3)
                         printf("Carro rejeitado. Nenhuma das regras de disponibilidade foram aceitas.\n");
                     else
-                        printf("Carro registrado.");  
-                }              
-                break;
+                        printf("Carro registrado."); 
+                }
+                break;               
             
             case 2:
                 print_cars(courtyard_1, courtyard_2);

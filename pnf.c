@@ -27,7 +27,7 @@ int checkLicensePlate (Stack *courtyard_1, Queue *courtyard_2, int license_plate
     return SUCSSES; // license plate not on any courtyard
 }
 
-int checkIn(Stack *courtyard_1, Queue *courtyard_2, elem new){
+int checkIn(Stack *courtyard_1, Queue *courtyard_2, elem *new){
     int license_plate, arrival, hours_total, departure;
     printf("Informe a placa do veiculo: (4 dígitos)\n");
     scanf("%d", &license_plate);
@@ -43,10 +43,10 @@ int checkIn(Stack *courtyard_1, Queue *courtyard_2, elem new){
     if ((arrival < 8) || (departure > 22))
         return ERR_OUT_TIME; 
 
-    new.license_plate = license_plate;
-    new.arrival = arrival;
-    new.departure = departure;
-    new.discount = 1.0;
+    (*new).license_plate = license_plate;
+    (*new).arrival = arrival;
+    (*new).departure = departure;
+    (*new).discount = 1.0;
 
     return SUCSSES;
 }
@@ -57,9 +57,9 @@ void checkOut (Stack *courtyard_1, Queue *courtyard_2, elem new){
     int payment_value;
     while(aux1 != NULL){
         if (aux1->info.departure <= new.arrival){
-            printf("Placa: %d", aux1->info.license_plate);
+            printf("Placa: %d\n", aux1->info.license_plate);
             payment_value = (aux1->info.departure - aux1->info.arrival) * 3 * aux1->info.discount;
-            printf("Valor a ser pago: %d", payment_value);
+            printf("Valor a ser pago: %d\n", payment_value);
             pop(courtyard_1, &aux1->info);
         }
         aux1 = aux1->next;
@@ -69,10 +69,10 @@ void checkOut (Stack *courtyard_1, Queue *courtyard_2, elem new){
     Node *aux2 = courtyard_2->begin;
     while(aux2 != NULL){
         if (aux2->info.departure <= new.arrival){
-            printf("Placa: %d", aux2->info.license_plate);
+            printf("Placa: %d\n", aux2->info.license_plate);
             payment_value = (aux2->info.departure - aux2->info.arrival) * 3 * aux2->info.discount;
-            printf("Valor a ser pago: %d", payment_value);
-            pop(courtyard_2, &aux2->info);
+            printf("Valor a ser pago: %d\n", payment_value);
+            out(courtyard_2, &aux2->info);
         }
         aux2 = aux2->next;
     }
@@ -103,7 +103,7 @@ elem *get_vector(Stack *courtyard_1, Queue *courtyard_2, int size){
 }
 
 void discount_raffle (Stack *courtyard_1, Queue *courtyard_2, elem new){
-    int total_cars = checkSize(courtyard_1) + checkSize_queue(courtyard_2);
+    int total_cars = checkSize_stack(courtyard_1) + checkSize_queue(courtyard_2);
     elem *vector_cars;
     if (((new.arrival == 9) || (new.arrival == 12) || (new.arrival == 15) || (new.arrival == 18)) && (total_cars > 4)){
         // All parameters are okay to make the discount roulette and get the car discount
@@ -118,7 +118,7 @@ void discount_raffle (Stack *courtyard_1, Queue *courtyard_2, elem new){
         elem aux; 
         bool found = false;
         // Check if car is on courtyard 1
-        for(int i = 0; i < checkSize(courtyard_1); i++){
+        for(int i = 0; i < checkSize_stack(courtyard_1); i++){
             pop(courtyard_1, &aux);
             if (aux.license_plate == vector_cars[roulette_cursor].license_plate)
                 aux.discount = 0.9; // discount of 10%
@@ -127,7 +127,7 @@ void discount_raffle (Stack *courtyard_1, Queue *courtyard_2, elem new){
         }
         // If it is not in courtyard 1, check courtyard 2
         if (found == false){
-            for(int i = 0; i < checkSize(courtyard_2); i++){
+            for(int i = 0; i < checkSize_queue(courtyard_2); i++){
                 out(courtyard_2, &aux);
                 if (aux.license_plate == vector_cars[roulette_cursor].license_plate)
                     aux.discount = 0.9; // discount of 10%
@@ -150,7 +150,7 @@ int disponibility(Stack *courtyard_1, Queue *courtyard_2, elem new){
     else{
         if (!isFull_stack(courtyard_1) && (new.departure <= courtyard_1->begin->info.departure))
             push(courtyard_1, new);
-        else if(!isFull_stack(courtyard_2) && (new.departure >= courtyard_2->end->info.departure))
+        else if(!isFull_queue(courtyard_2) && (new.departure >= courtyard_2->end->info.departure))
             in(courtyard_2, new);
         else
             return ERR_DISPONIBILITY;      
